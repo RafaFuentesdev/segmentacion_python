@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 from pyspark.ml.feature import StandardScaler, VectorAssembler, PCA
 
+
 # Initialize Spark session
 spark = SparkSession.builder \
     .appName("PCA Dimensionality Reduction") \
@@ -25,7 +26,7 @@ scaler_model = scaler.fit(data_with_features)
 scaled_data = scaler_model.transform(data_with_features)
 
 # Apply PCA for dimensionality reduction
-num_pca_components = 3  # Change this value according to your needs
+num_pca_components = 4  # Change this value according to your needs
 pca = PCA(k=num_pca_components, inputCol="scaled_features", outputCol="pca_features")
 pca_model = pca.fit(scaled_data)
 pca_data = pca_model.transform(scaled_data)
@@ -37,9 +38,11 @@ pca_data.select("pca_features").show(10)
 # ...
 explained_variance = pca_model.explainedVariance
 print("Explained Variance by Principal Components:")
+sum = 0
 for i, variance in enumerate(explained_variance):
     print(f"PC{i+1}: {variance:.4f}")
-
+    sum += variance
+print(f"Total variance {(sum*100):.4f}%")
 
 # Stop Spark session
 spark.stop()
