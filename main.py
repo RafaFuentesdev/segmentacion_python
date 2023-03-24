@@ -1,9 +1,9 @@
 from pyspark.sql import SparkSession
-from pyspark.ml.feature import StandardScaler, VectorAssembler
+from pyspark.ml.feature import StandardScaler, VectorAssembler, PCA
 
 # Initialize Spark session
 spark = SparkSession.builder \
-    .appName("Data Preprocessing") \
+    .appName("PCA Dimensionality Reduction") \
     .getOrCreate()
 
 # Read data from Parquet file
@@ -24,12 +24,22 @@ scaler = StandardScaler(inputCol="features", outputCol="scaled_features", withSt
 scaler_model = scaler.fit(data_with_features)
 scaled_data = scaler_model.transform(data_with_features)
 
-# Show the first 10 rows with the original and standardized features
-scaled_data.select("features", "scaled_features").show(10)
+# Apply PCA for dimensionality reduction
+num_pca_components = 3  # Change this value according to your needs
+pca = PCA(k=num_pca_components, inputCol="scaled_features", outputCol="pca_features")
+pca_model = pca.fit(scaled_data)
+pca_data = pca_model.transform(scaled_data)
 
+# Show the first 10 rows with the PCA features
+pca_data.select("pca_features").show(10)
 
 # Perform any further data processing as needed
 # ...
+explained_variance = pca_model.explainedVariance
+print("Explained Variance by Principal Components:")
+for i, variance in enumerate(explained_variance):
+    print(f"PC{i+1}: {variance:.4f}")
+
 
 # Stop Spark session
 spark.stop()
