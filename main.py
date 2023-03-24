@@ -26,7 +26,7 @@ scaler_model = scaler.fit(data_with_features)
 scaled_data = scaler_model.transform(data_with_features)
 
 # Apply PCA for dimensionality reduction
-num_pca_components = 4  # Change this value according to your needs
+num_pca_components = 3 # Change this value according to your needs
 pca = PCA(k=num_pca_components, inputCol="scaled_features", outputCol="pca_features")
 pca_model = pca.fit(scaled_data)
 pca_data = pca_model.transform(scaled_data)
